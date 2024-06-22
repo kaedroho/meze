@@ -4,6 +4,7 @@ from django.test import TestCase as DjangoTestCase
 BOUNDARY = "BoUnDaRyStRiNg"
 MULTIPART_CONTENT = "multipart/form-data; boundary=%s" % BOUNDARY
 
+
 class Client(DjangoClient):
     def get(
         self, path, data=None, secure=False, *, headers=None, query_params=None, **extra

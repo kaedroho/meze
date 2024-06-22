@@ -1,18 +1,30 @@
+import warnings
 from django.views.generic.base import ContextMixin, View
 
 from .response import Response
-
+from .metadata import Metadata
 
 class DjangoBridgeMixin:
     """A mixin that can be used to render a view with a React component."""
 
     title = None
+    metadata = None
     view_name = None
     overlay = False
     response_class = Response
 
     def get_title(self):
+        if self.title:
+            warnings.warn(
+                "The title attribute is deprecated. Use metadata instead.",
+                PendingDeprecationWarning,
+            )
         return self.title
+
+    def get_metadata(self):
+        if not self.metadata:
+            return Metadata(title=self.get_title())
+        return self.metadata
 
     def render_to_response(self, props):
         """
@@ -26,7 +38,7 @@ class DjangoBridgeMixin:
             self.view_name,
             props,
             overlay=self.overlay,
-            title=self.title,
+            metadata=self.get_metadata(),
         )
 
 

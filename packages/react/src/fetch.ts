@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { Metadata } from "./metadata";
+
 export type MessageLevel = "info" | "success" | "warning" | "error";
 
 export interface TextMessage {
@@ -26,7 +28,7 @@ interface RedirectResponse {
 interface RenderResponse {
   status: "render";
   overlay: boolean;
-  title: string;
+  metadata: Metadata;
   view: string;
   props: Record<string, unknown>;
   context: Record<string, unknown>;

@@ -1,3 +1,4 @@
+import warnings
 from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
@@ -6,6 +7,7 @@ from django.utils.html import conditional_escape
 from django.utils.module_loading import import_string
 
 from .adapters.registry import JSContext
+from .metadata import Metadata
 
 
 def get_messages(request):
@@ -53,12 +55,31 @@ class Response(BaseResponse):
     status = "render"
 
     def __init__(
-        self, request, view, props, *, overlay=False, title="", http_status=None
+        self,
+        request,
+        view,
+        props,
+        *,
+        overlay=False,
+        title="",
+        metadata: Metadata = None,
+        http_status=None,
     ):
+        if metadata is None:
+            if title:
+                warnings.warn(
+                    "The title argument is deprecated. Use metadata instead.",
+                    PendingDeprecationWarning,
+                )
+
+            metadata = Metadata(title=title)
+        elif title:
+            raise TypeError("title and metadata cannot both be provided")
+
         self.view = view
         self.props = props
         self.overlay = overlay
-        self.title = title
+        self.metadata = metadata
         self.context = {
             name: import_string(provider)(request)
             for name, provider in settings.DJANGO_BRIDGE.get(
@@ -70,7 +91,7 @@ class Response(BaseResponse):
             {
                 "view": self.view,
                 "overlay": self.overlay,
-                "title": self.title,
+                "metadata": self.metadata,
                 "props": self.props,
                 "context": self.context,
                 "messages": self.messages,
