@@ -143,46 +143,44 @@ export function App({ config, initialResponse }: AppProps): ReactElement {
   );
 
   return (
-    <div>
-      <DirtyFormScope handleBrowserUnload>
-        <MessagesContext.Provider value={messagesContext}>
-          {overlay && (
-            <DirtyFormScope>
-              <Overlay
-                config={config}
-                initialResponse={overlay.initialResponse}
-                initialPath={overlay.initialPath}
-                parentNavigationContoller={navigationController}
-                render={(content) => overlay.render(content)}
-                requestClose={() => setOverlayCloseRequested(true)}
-                closeRequested={overlayCloseRequested}
-                onCloseCompleted={() => {
-                  setOverlay(null);
-                  setOverlayCloseRequested(false);
-
-                  // Call overlay close listener
-                  if (overlayCloseListener.current) {
-                    overlayCloseListener.current();
-                    overlayCloseListener.current = null;
-                  }
-                }}
-                onServerError={onServerError}
-              />
-            </DirtyFormScope>
-          )}
-          {!navigationController.isLoading && (
-            <Browser
+    <DirtyFormScope handleBrowserUnload>
+      <MessagesContext.Provider value={messagesContext}>
+        {overlay && (
+          <DirtyFormScope>
+            <Overlay
               config={config}
-              navigationController={navigationController}
-              openOverlay={(url, renderOverlay, options) =>
-                // eslint-disable-next-line no-void
-                void openOverlay(url, renderOverlay, options)
-              }
+              initialResponse={overlay.initialResponse}
+              initialPath={overlay.initialPath}
+              parentNavigationContoller={navigationController}
+              render={(content) => overlay.render(content)}
+              requestClose={() => setOverlayCloseRequested(true)}
+              closeRequested={overlayCloseRequested}
+              onCloseCompleted={() => {
+                setOverlay(null);
+                setOverlayCloseRequested(false);
+
+                // Call overlay close listener
+                if (overlayCloseListener.current) {
+                  overlayCloseListener.current();
+                  overlayCloseListener.current = null;
+                }
+              }}
+              onServerError={onServerError}
             />
-          )}
-        </MessagesContext.Provider>
-      </DirtyFormScope>
-    </div>
+          </DirtyFormScope>
+        )}
+        {!navigationController.isLoading && (
+          <Browser
+            config={config}
+            navigationController={navigationController}
+            openOverlay={(url, renderOverlay, options) =>
+              // eslint-disable-next-line no-void
+              void openOverlay(url, renderOverlay, options)
+            }
+          />
+        )}
+      </MessagesContext.Provider>
+    </DirtyFormScope>
   );
 }
 
