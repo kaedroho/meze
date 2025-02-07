@@ -30,8 +30,8 @@ ALLOWED_HOSTS = ["localhost", "testserver"]
 # Application definition
 
 INSTALLED_APPS = [
+    "testapp",
     "django_bridge",
-    "django_bridge.test",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "django_bridge.test.urls"
+ROOT_URLCONF = "testapp.urls"
 
 TEMPLATES = [
     {
