@@ -26,13 +26,13 @@ class BaseResponse(JsonResponse):
 
     status = None
 
-    def __init__(self, *args, http_status=None, **kwargs):
+    def __init__(self, data, *, http_status=None):
         js_context = JSContext()
-        data = {
+        self.data = {
             "status": self.status,
+            **data,
         }
-        data.update(js_context.pack(self.get_data(*args, **kwargs)))
-        super().__init__(data, status=http_status)
+        super().__init__(js_context.pack(self.data), status=http_status)
         self["X-DjangoBridge-Status"] = self.status
 
         # Make sure that Django Bridge responses are never cached by browsers
@@ -44,9 +44,6 @@ class BaseResponse(JsonResponse):
         # This behaviour only seems to occur (intermittently) on Firefox.
         patch_cache_control(self, no_store=True)
 
-    def get_data(self):
-        return {}
-
 
 class Response(BaseResponse):
     """
@@ -55,26 +52,31 @@ class Response(BaseResponse):
 
     status = "render"
 
-    def __init__(self, request, *args, overlay=False, title="", **kwargs):
-        self.request = request
+    def __init__(
+        self, request, view, props, *, overlay=False, title="", http_status=None
+    ):
+        self.view = view
+        self.props = props
         self.overlay = overlay
         self.title = title
-        super().__init__(*args, **kwargs)
-
-    def get_data(self, view, props):
-        return {
-            "view": view,
-            "overlay": self.overlay,
-            "title": self.title,
-            "props": props,
-            "context": {
-                name: import_string(provider)(self.request)
-                for name, provider in settings.DJANGO_BRIDGE.get(
-                    "CONTEXT_PROVIDERS", {}
-                ).items()
-            },
-            "messages": get_messages(self.request),
+        self.context = {
+            name: import_string(provider)(request)
+            for name, provider in settings.DJANGO_BRIDGE.get(
+                "CONTEXT_PROVIDERS", {}
+            ).items()
         }
+        self.messages = (get_messages(request),)
+        super().__init__(
+            {
+                "view": self.view,
+                "overlay": self.overlay,
+                "title": self.title,
+                "props": self.props,
+                "context": self.context,
+                "messages": self.messages,
+            },
+            http_status=http_status,
+        )
 
 
 class ReloadResponse(BaseResponse):
@@ -88,20 +90,22 @@ class ReloadResponse(BaseResponse):
 class RedirectResponse(BaseResponse):
     status = "redirect"
 
-    def get_data(self, path):
-        return {
-            "path": path,
-        }
+    def __init__(self, path):
+        self.path = path
+        super().__init__(
+            {
+                "path": self.path,
+            }
+        )
 
 
 class CloseOverlayResponse(BaseResponse):
     status = "close-overlay"
 
-    def __init__(self, request, *args, **kwargs):
-        self.request = request
-        super().__init__(*args, **kwargs)
-
-    def get_data(self):
-        return {
-            "messages": get_messages(self.request),
-        }
+    def __init__(self, request):
+        self.messages = (get_messages(request),)
+        super().__init__(
+            {
+                "messages": self.messages,
+            }
+        )
