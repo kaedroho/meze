@@ -17,16 +17,16 @@ export interface HTMLMessage {
 export type Message = TextMessage | HTMLMessage;
 
 interface ReloadResponse {
-  status: "reload";
+  action: "reload";
 }
 
 interface RedirectResponse {
-  status: "redirect";
+  action: "redirect";
   path: string;
 }
 
 interface RenderResponse {
-  status: "render";
+  action: "render";
   overlay: boolean;
   metadata: Metadata;
   view: string;
@@ -36,16 +36,16 @@ interface RenderResponse {
 }
 
 interface CloseOverlayResponse {
-  status: "close-overlay";
+  action: "close-overlay";
   messages: Message[];
 }
 
 interface ServerErrorResponse {
-  status: "server-error";
+  action: "server-error";
 }
 
 interface NetworkErrorResponse {
-  status: "network-error";
+  action: "network-error";
 }
 
 export type DjangoBridgeResponse =
@@ -71,18 +71,18 @@ export async function djangoGet(
     response = await fetch(url, { headers });
   } catch (e) {
     return {
-      status: "network-error",
+      action: "network-error",
     };
   }
 
   if (response.status === 500) {
     return {
-      status: "server-error",
+      action: "server-error",
     };
   }
-  if (!response.headers.get("X-DjangoBridge-Status")) {
+  if (!response.headers.get("X-DjangoBridge-Action")) {
     return {
-      status: "reload",
+      action: "reload",
     };
   }
   return response.json() as Promise<DjangoBridgeResponse>;
@@ -108,18 +108,18 @@ export async function djangoPost(
     });
   } catch (e) {
     return {
-      status: "network-error",
+      action: "network-error",
     };
   }
 
   if (response.status === 500) {
     return {
-      status: "server-error",
+      action: "server-error",
     };
   }
-  if (!response.headers.get("X-DjangoBridge-Status")) {
+  if (!response.headers.get("X-DjangoBridge-Action")) {
     return {
-      status: "reload",
+      action: "reload",
     };
   }
   return response.json() as Promise<DjangoBridgeResponse>;

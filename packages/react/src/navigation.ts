@@ -136,7 +136,7 @@ export function useNavigationController(
       pushState = true,
       neverReload = false
     ): Promise<void> => {
-      if (response.status === "reload") {
+      if (response.action === "reload") {
         if (!parent) {
           window.location.href = path;
         } else {
@@ -144,11 +144,11 @@ export function useNavigationController(
           // Escalate this response to the page's navigation controller instead
           return parent.handleResponse(response, path);
         }
-      } else if (response.status === "redirect") {
+      } else if (response.action === "redirect") {
         // HACK: Needed to do this because we can't call navigate directly from here
         setRedirectTo(response.path);
         return Promise.resolve();
-      } else if (response.status === "render") {
+      } else if (response.action === "render") {
         // If this navigation controller is handling an overlay, make sure the response can be
         // loaded in a overlay. Otherwise, escalate it to parent
         if (parent && !response.overlay) {
@@ -180,17 +180,17 @@ export function useNavigationController(
           pushState,
           reload
         );
-      } else if (response.status === "close-overlay") {
+      } else if (response.action === "close-overlay") {
         // Call overlay close callback
         if (callbacks.onOverlayClose) {
           callbacks.onOverlayClose(response.messages);
         }
-      } else if (response.status === "server-error") {
+      } else if (response.action === "server-error") {
         if (callbacks.onServerError) {
           callbacks.onServerError("server");
         }
         return Promise.reject();
-      } else if (response.status === "network-error") {
+      } else if (response.action === "network-error") {
         if (callbacks.onServerError) {
           callbacks.onServerError("network");
         }

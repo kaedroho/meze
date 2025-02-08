@@ -26,16 +26,16 @@ class BaseResponse(JsonResponse):
     Base class for all Django Bridge responses.
     """
 
-    status = None
+    action = None
 
-    def __init__(self, data, *, http_status=None):
+    def __init__(self, data, *, status=None):
         js_context = JSContext()
         self.data = {
-            "status": self.status,
+            "action": self.action,
             **data,
         }
-        super().__init__(js_context.pack(self.data), status=http_status)
-        self["X-DjangoBridge-Status"] = self.status
+        super().__init__(js_context.pack(self.data), status=status)
+        self["X-DjangoBridge-Action"] = self.action
 
         # Make sure that Django Bridge responses are never cached by browsers
         # We need to do this because Django Bridge responses are given on the same URLs that
@@ -52,7 +52,7 @@ class Response(BaseResponse):
     Instructs the client to render a view (React component) with the given context.
     """
 
-    status = "render"
+    action = "render"
 
     def __init__(
         self,
@@ -63,7 +63,7 @@ class Response(BaseResponse):
         overlay=False,
         title="",
         metadata: Metadata = None,
-        http_status=None,
+        status=None,
     ):
         if metadata is None:
             if title:
@@ -96,7 +96,7 @@ class Response(BaseResponse):
                 "context": self.context,
                 "messages": self.messages,
             },
-            http_status=http_status,
+            status=status,
         )
 
 
@@ -105,11 +105,11 @@ class ReloadResponse(BaseResponse):
     Instructs the client to load the view the old-fashioned way.
     """
 
-    status = "reload"
+    action = "reload"
 
 
 class RedirectResponse(BaseResponse):
-    status = "redirect"
+    action = "redirect"
 
     def __init__(self, path):
         self.path = path
@@ -121,7 +121,7 @@ class RedirectResponse(BaseResponse):
 
 
 class CloseOverlayResponse(BaseResponse):
-    status = "close-overlay"
+    action = "close-overlay"
 
     def __init__(self, request):
         self.messages = (get_messages(request),)
