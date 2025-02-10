@@ -1,20 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { djangoGet, djangoPost, DjangoBridgeResponse, Message } from "./fetch";
-import { Metadata } from "./metadata";
+import {
+  djangoGet,
+  djangoPost,
+  DjangoBridgeResponse,
+  Message,
+  Frame,
+  Metadata,
+} from "@django-bridge/common";
 
 let nextFrameId = 1;
-
-export interface Frame<Props = Record<string, unknown>> {
-  id: number;
-  path: string;
-  metadata: Metadata;
-  view: string;
-  props: Props;
-  context: Record<string, unknown>;
-  shouldReloadCallback?: (newPath: string, newProps: Props) => boolean;
-}
 
 interface HistoryState {
   prevPath?: string;

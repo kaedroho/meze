@@ -1,32 +1,16 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
-import { Context, FunctionComponent } from "react";
-import Telepath from "telepath-unpack";
+import { Context } from "react";
 
-export default class Config {
-  public views: Map<string, FunctionComponent>;
+import { Config as CommonConfig } from "@django-bridge/common";
 
+export default class Config extends CommonConfig {
   public contextProviders: Map<string, Context<unknown>>;
 
-  // Telepath Doesn't support typescript yet
-  public telepathRegistry: Telepath;
-
   constructor() {
-    this.views = new Map();
+    super();
     this.contextProviders = new Map();
-    this.telepathRegistry = new Telepath();
-
-    // Add default adapters
-    this.addAdapter("Date", Date);
   }
-
-  public addView = <P>(
-    name: string,
-    component: FunctionComponent<P>
-  ): Config => {
-    this.views.set(name, component as FunctionComponent<object>);
-    return this;
-  };
 
   public addContextProvider = <C>(
     name: string,
@@ -35,15 +19,4 @@ export default class Config {
     this.contextProviders.set(name, context as Context<unknown>);
     return this;
   };
-
-  public addAdapter = <Cls>(
-    name: string,
-    ctor: { new (...args: any[]): Cls }
-  ): Config => {
-    this.telepathRegistry.register(name, ctor);
-    return this;
-  };
-
-  public unpack = (data: Record<string, unknown>): Record<string, unknown> =>
-    this.telepathRegistry.unpack(data);
 }

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Message } from "./fetch";
+import { Message } from "@django-bridge/common";
 
 export interface NavigateOptions {
   pushState?: boolean;

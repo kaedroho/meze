@@ -1,7 +1,7 @@
 {
-  "name": "@django-bridge/react",
-  "version": "0.3.2",
-  "description": "The simple way to build Django applications with modern React frontends",
+  "name": "@django-bridge/next",
+  "version": "0.4.0-rc.1",
+  "description": "The simple way to build Django applications with modern Next.js frontends",
   "repository": "https://github.com/django-bridge/django-bridge",
   "license": "BSD-3-Clause",
   "main": "dist/index.js",

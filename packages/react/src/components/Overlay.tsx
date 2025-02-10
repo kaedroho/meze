@@ -1,4 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
+import { DjangoBridgeResponse, Frame, Message } from "@django-bridge/common";
 import Config from "../config";
 import {
   MessagesContext,
@@ -6,13 +7,8 @@ import {
   OverlayContextType,
 } from "../contexts";
 import { DirtyFormContext } from "../dirtyform";
-import {
-  Frame,
-  NavigationController,
-  useNavigationController,
-} from "../navigation";
+import { NavigationController, useNavigationController } from "../navigation";
 import Browser from "./Browser";
-import { DjangoBridgeResponse, Message } from "../fetch";
 
 export interface OverlayProps {
   config: Config;
